@@ -1,0 +1,1 @@
+# Para manejo de archivos en go via http u solicitado desde otro paquete
