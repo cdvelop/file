@@ -10,14 +10,11 @@ import (
 	"github.com/cdvelop/model"
 )
 
-func readTest(endpoint string, server *httptest.Server, response *model.Response) {
+func readTest(endpoint string, server *httptest.Server, response model.Response) {
 	for _, dta_resp := range response.Data {
 
-		// Definir el ID del archivo que deseamos obtener
-		id_file := dta_resp["id_file"]
-
 		// Construir la URL de la solicitud GET con el parámetro "id_file"
-		url := fmt.Sprintf(server.URL+endpoint+"?id_file=%s", id_file)
+		url := fmt.Sprintf(server.URL+endpoint+"?id=%s", dta_resp["id_file"])
 
 		// fmt.Println("URL: ", url)
 
@@ -38,6 +35,10 @@ func readTest(endpoint string, server *httptest.Server, response *model.Response
 
 		// fmt.Println("*** RESPUESTA SOLICITUD READ: ")
 		// fmt.Println("CÓDIGO ESTATUS:", get_response.StatusCode)
+
+		if get_response.StatusCode != 200 {
+			log.Fatalln("se esperaba código 200 respuesta: ", get_response.StatusCode)
+		}
 
 		// Procesar la respuesta recibida
 		// fmt.Println("TAMAÑO ARCHIVO RESPUESTA GET: ", len(bodyBytes))

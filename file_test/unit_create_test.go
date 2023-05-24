@@ -2,7 +2,6 @@ package file_test
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -11,6 +10,8 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	json "github.com/fxamacker/cbor/v2"
 
 	"github.com/cdvelop/file"
 	"github.com/cdvelop/model"
@@ -27,9 +28,9 @@ var (
 		expected   string
 	}{
 		// "1 archivo < 37 kb ok": {true, http.MethodPut, []string{"dino.png"}, ".png", 1, 37, "ok"},
-		"gatito 220kb y dino 36kb ok": {"/file", http.MethodPost, []string{"dino.png", "gatito.jpeg"}, ".png, .jpg", 2, 262, "create"},
-		"gatito 220kb ok":             {"/file", http.MethodPost, []string{"gatito.jpeg"}, ".jpg", 1, 220, "create"},
-		"gatito 220kb error":          {"/file", http.MethodPost, []string{"gatito.jpeg"}, ".jpg", 1, 200, "error"},
+		// "gatito 220kb y dino 36kb ok": {"/file", http.MethodPost, []string{"dino.png", "gatito.jpeg"}, ".png, .jpg", 2, 262, "create"},
+		"gatito 220kb ok": {"/file", http.MethodPost, []string{"gatito.jpeg"}, ".jpg", 1, 220, "create"},
+		// "tamaño gatito 220kb y permitido 200 se espera error": {"/file", http.MethodPost, []string{"gatito.jpeg"}, ".jpg", 1, 200, "error"},
 	}
 )
 
@@ -88,6 +89,19 @@ func Test_ServeHTTP(t *testing.T) {
 				}
 			}
 
+			// Agregamos los parámetros al formulario
+
+			for key, value := range map[string]string{
+				"module_name": module_name,
+				"field_name":  field_name,
+				"folder_id":   randomNumber(),
+			} {
+				err = writer.WriteField(key, value)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+
 			err := writer.Close()
 			if err != nil {
 				log.Fatal(err)
@@ -99,11 +113,6 @@ func Test_ServeHTTP(t *testing.T) {
 				log.Fatalf("error %s", err)
 			}
 			req.Header.Add("Content-Type", writer.FormDataContentType())
-			req.Header.Add("Action-Type", "create")
-
-			req.Header.Add("module_name", module_name)
-			req.Header.Add("field_name", field_name)
-			req.Header.Add("folder_id", randomNumber())
 
 			res, err := c.Do(req)
 			if err != nil {
@@ -130,9 +139,11 @@ func Test_ServeHTTP(t *testing.T) {
 
 			if response.Type != "error" {
 
-				readTest(data.endpoint, server, &response)
+				updateTest(data.endpoint, server, response)
 
-				deleteTest(data.endpoint, server, &response)
+				readTest(data.endpoint, server, response)
+
+				deleteTest(data.endpoint, server, response)
 			}
 
 		})

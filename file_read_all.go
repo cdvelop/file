@@ -7,7 +7,7 @@ import (
 	"github.com/cdvelop/dbtools"
 )
 
-func (f File) readFiles(folder_id string, w http.ResponseWriter, r *http.Request) {
+func (f File) ReadAll(folder_id string, w http.ResponseWriter, r *http.Request) {
 	data_out, msg, ok := f.ReadAllFilesID(folder_id)
 	if !ok {
 		f.error(w, msg, http.StatusNotFound)

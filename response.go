@@ -1,9 +1,10 @@
 package file
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
+
+	json "github.com/fxamacker/cbor/v2"
 
 	"github.com/cdvelop/model"
 )

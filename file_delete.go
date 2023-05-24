@@ -1,14 +1,15 @@
 package file
 
 import (
-	"encoding/json"
 	"net/http"
 	"os"
+
+	json "github.com/fxamacker/cbor/v2"
 
 	"github.com/cdvelop/model"
 )
 
-func (f File) deleteFile(w http.ResponseWriter, r *http.Request) {
+func (f File) Delete(w http.ResponseWriter, r *http.Request) {
 
 	// Decodificar los datos JSON recibidos
 	var requestData model.Response
@@ -27,7 +28,7 @@ func (f File) deleteFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	f.response(w, http.StatusOK, "DELETE", "TESTEANDO", "moduleTest")
+	f.response(w, http.StatusOK, "DELETE", message, "moduleTest")
 
 }
 

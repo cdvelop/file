@@ -8,18 +8,26 @@ import (
 	"github.com/cdvelop/dbtools"
 )
 
-func (f File) readFile(id_file string, w http.ResponseWriter, r *http.Request) {
+func (f File) ReadFile(id_file string, w http.ResponseWriter, r *http.Request) {
 
 	file_path, ok := f.GetPathFileByID(id_file)
 	if !ok {
 		f.error(w, file_path, http.StatusNotFound)
 		return
 	}
-
 	// fmt.Println("DATA SOLICITADA: ", out)
-
 	// Servir el archivo encontrado
 	http.ServeFile(w, r, file_path)
+
+}
+func (f File) ReadOne(id_file string, w http.ResponseWriter, r *http.Request) {
+
+	var message string
+	data := f.ReadObject(f.Name(), id_file)
+	delete(data, "file_path")
+	// fmt.Println("DATA SOLICITADA: ", data)
+	// Servir json
+	f.response(w, 200, "read", message, "file", data)
 
 }
 
@@ -34,7 +42,8 @@ func (f File) GetPathFileByID(id_file string) (string, bool) {
 }
 
 func (f File) GetAllDataFromDB(data_with_id_file ...map[string]string) ([]map[string]string, string, bool) {
-
+	f.Open()
+	defer f.Close()
 	// crear argumentos ids de slice de interfaces
 	args_ids := make([]interface{}, len(data_with_id_file))
 	for i, data := range data_with_id_file {

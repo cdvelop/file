@@ -1,7 +1,6 @@
 package file
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/cdvelop/dbtools"
@@ -11,16 +10,17 @@ import (
 
 func (f *File) checkDataBase() {
 
-	dba := sqlite.NewConnection(root_folder, "stored_files_index.db", false)
+	dba := sqlite.NewConnection(f.root_folder, "stored_files_index.db", false)
 
 	db := objectdb.Get(dba)
-
+	db.Open()
+	defer db.Close()
 	f.Connection = db
 
 	if !dba.TableExist(f.Object().Name, f.Connection) {
 		db.Set(dba)
 		// defer db.Close()
-		fmt.Println("NO EXISTE TABLA: ", f.Object().Name)
+		// fmt.Println("NO EXISTE TABLA: ", f.Object().Name)
 
 		m := dbtools.NewOperationDB(db.DB, dba)
 

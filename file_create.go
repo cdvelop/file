@@ -3,21 +3,16 @@ package file
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 const error_message_big_file = "error archivo muy grande. tamaño máximo admitido: %v kb"
 
-// createFile upload files http handler
-func (f File) createFile(w http.ResponseWriter, r *http.Request) {
-	// fmt.Println("HOST: ", r.Host)
+// Create upload files http handler
+func (f File) Create(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println("TAMAÑO CONTENIDO: ", r.ContentLength)
 	// for i, v := range r.Header {
 	// 	fmt.Println(i, v)
@@ -29,40 +24,28 @@ func (f File) createFile(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseMultipartForm(max_size)
 	if err != nil {
-
 		if strings.Contains(err.Error(), "multipart") {
 			f.error(w, err.Error(), http.StatusNotAcceptable)
 		} else {
 			f.error(w, fmt.Sprintf(error_message_big_file, f.max_kb_size), http.StatusNotAcceptable)
 		}
-
-		log.Println("Error MultipartForm: ", err)
-
+		// log.Println("Error MultipartForm: ", err)
 		return
 	}
 
 	var new_data = make(map[string]string)
 
 	for i, field := range f.Object().Fields {
-		if i > 0 && i <= 4 {
-
-			TitleField := cases.Title(language.Spanish).String(field.Name)
-			recovered_field := strings.Join(r.Header[TitleField][:], " ") // ej: medicalhistory, clients, products, staffs
-			lower_field := strings.ToLower(recovered_field)
-
-			// fmt.Println("TITLE", TitleField, " LOWER FIELD NAME: ", lower_field)
-			new_data[field.Name] = lower_field
-			if new_data[field.Name] == "" && !field.SkipCompletionAllowed {
-				f.error(w, "Error Campo "+field.Name+" en Headers no enviado", http.StatusMethodNotAllowed)
-				return
-			}
+		if i > 0 && i <= 4 { // saltarse id y file_path
+			new_data[field.Name] = r.FormValue(field.Name)
 		}
 	}
 
-	// ej ./app_files/medicalhistory/endoscopia/123344
-	upload_folder := root_folder + new_data["module_name"] + "/" + new_data["field_name"] + "/" + new_data["folder_id"]
+	// fmt.Println("FORM VALUES: ", new_data)
 
-	// get a reference to the fileHeaders
+	// ej ./app_files/medicalhistory/endoscopia/123344
+	upload_folder := f.root_folder + "/" + new_data["module_name"] + "/" + new_data["field_name"] + "/" + new_data["folder_id"]
+
 	files := r.MultipartForm.File[new_data["field_name"]]
 	if len(files) == 0 {
 		f.error(w, "no hay archivos detectados", http.StatusNotAcceptable)
