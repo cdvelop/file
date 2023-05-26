@@ -27,10 +27,9 @@ var (
 		max_size   int64
 		expected   string
 	}{
-		// "1 archivo < 37 kb ok": {true, http.MethodPut, []string{"dino.png"}, ".png", 1, 37, "ok"},
-		// "gatito 220kb y dino 36kb ok": {"/file", http.MethodPost, []string{"dino.png", "gatito.jpeg"}, ".png, .jpg", 2, 262, "create"},
-		"gatito 220kb ok": {"/file", http.MethodPost, []string{"gatito.jpeg"}, ".jpg", 1, 220, "create"},
-		// "tamaño gatito 220kb y permitido 200 se espera error": {"/file", http.MethodPost, []string{"gatito.jpeg"}, ".jpg", 1, 200, "error"},
+		"gatito 220kb y dino 36kb ok":                         {"/file", http.MethodPost, []string{"dino.png", "gatito.jpeg"}, ".png, .jpg", 2, 262, "create"},
+		"gatito 220kb ok":                                     {"/file", http.MethodPost, []string{"gatito.jpeg"}, ".jpg", 1, 220, "create"},
+		"tamaño gatito 220kb y permitido 200 se espera error": {"/file", http.MethodPost, []string{"gatito.jpeg"}, ".jpg", 1, 200, "error"},
 	}
 )
 
@@ -139,11 +138,17 @@ func Test_ServeHTTP(t *testing.T) {
 
 			if response.Type != "error" {
 
-				updateTest(data.endpoint, server, response)
+				t.Run("UPDATE Test:", func(t *testing.T) {
+					updateTest(data.endpoint, server, response)
+				})
+				t.Run("READ Test:", func(t *testing.T) {
+					readTest(data.endpoint, server, response)
+				})
 
-				readTest(data.endpoint, server, response)
+				t.Run("DELETE Test:", func(t *testing.T) {
+					deleteTest(data.endpoint, server, response)
+				})
 
-				deleteTest(data.endpoint, server, response)
 			}
 
 		})

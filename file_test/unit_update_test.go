@@ -9,10 +9,9 @@ import (
 	"github.com/cdvelop/model"
 )
 
-func updateTest(endpoint string, server *httptest.Server, rq model.Response) {
+func updateTest(endpoint string, server *httptest.Server, rq model.Response) bool {
 
 	// fmt.Println("DATA A ACTUALIZAR: ", rq)
-
 	for i, data := range rq.Data {
 		data["description"] = "perro"
 		rq.Data[i] = data
@@ -21,12 +20,11 @@ func updateTest(endpoint string, server *httptest.Server, rq model.Response) {
 	update_resp := newRequest(http.MethodPatch, server.URL+endpoint, &rq)
 
 	// fmt.Println("\n*** RESPUESTA SOLICITUD UPDATE: ", update_resp)
-
 	if update_resp.Message != "Actualización Exitosa" {
 		log.Fatalln("Error se esperaba Actualización Exitosa se obtuvo: ", update_resp.Message)
 	}
 
-	for i, data := range rq.Data {
+	for _, data := range rq.Data {
 
 		// Construir la URL de la solicitud GET con el parámetro "id_file"
 		url := fmt.Sprintf(server.URL+endpoint+"?read_one=%s", data["id_file"])
@@ -35,12 +33,14 @@ func updateTest(endpoint string, server *httptest.Server, rq model.Response) {
 
 		// fmt.Println(i, "- RESPUESTA SOLICITUD READ: ", read_resp)
 
-		description := read_resp.Data[i]["description"]
+		for _, data := range read_resp.Data {
 
-		if description != "perro" {
-			log.Fatalln("Error se esperaba en description perro se obtuvo: ", description)
+			if data["description"] != "perro" {
+				log.Fatalln("Error se esperaba en description perro se obtuvo: ", data["description"])
+			}
 		}
 
 	}
 
+	return true
 }
