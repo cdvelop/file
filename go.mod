@@ -16,7 +16,7 @@ require (
 
 require (
 	github.com/cdvelop/model v0.0.24
-	github.com/cdvelop/sqlite v0.0.5
+	github.com/cdvelop/sqlite v0.0.6
 	github.com/fxamacker/cbor/v2 v2.4.0
 	github.com/gabriel-vasile/mimetype v1.4.2
 	golang.org/x/text v0.9.0 // indirect
