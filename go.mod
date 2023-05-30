@@ -3,7 +3,7 @@ module github.com/cdvelop/file
 go 1.20
 
 require (
-	github.com/cdvelop/dbtools v0.0.6
+	github.com/cdvelop/dbtools v0.0.7
 	github.com/cdvelop/input v0.0.5
 	github.com/cdvelop/objectdb v0.0.4
 )
@@ -15,7 +15,7 @@ require (
 )
 
 require (
-	github.com/cdvelop/model v0.0.23
+	github.com/cdvelop/model v0.0.24
 	github.com/cdvelop/sqlite v0.0.5
 	github.com/fxamacker/cbor/v2 v2.4.0
 	github.com/gabriel-vasile/mimetype v1.4.2
