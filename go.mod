@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/cdvelop/dbtools v0.0.7
 	github.com/cdvelop/input v0.0.5
-	github.com/cdvelop/objectdb v0.0.4
+	github.com/cdvelop/objectdb v0.0.5
 )
 
 require (
