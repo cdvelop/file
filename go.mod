@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/cdvelop/dbtools v0.0.8
-	github.com/cdvelop/input v0.0.8
+	github.com/cdvelop/input v0.0.9
 	github.com/cdvelop/objectdb v0.0.6
 )
 
@@ -15,7 +15,7 @@ require (
 )
 
 require (
-	github.com/cdvelop/model v0.0.26
+	github.com/cdvelop/model v0.0.27
 	github.com/cdvelop/sqlite v0.0.7
 	github.com/fxamacker/cbor/v2 v2.4.0
 	github.com/gabriel-vasile/mimetype v1.4.2
