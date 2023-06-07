@@ -1,5 +1,7 @@
 package file
 
+import "github.com/cdvelop/sqlite"
+
 // root_folder ej: "./app_files", "./static_files"
 // extensions: ej: ".jpg, .png, .jpeg"
 // max_files ej: 1,4 6..
@@ -13,7 +15,7 @@ func New(rootFolder, extensions string, max_files, max_kb_size int64) *File {
 		max_kb_size: max_kb_size,
 	}
 
-	f.checkDataBase()
+	f.Connection = sqlite.CheckDataBase(f.root_folder, "stored_files_index.db", false, f.Object())
 
 	return &f
 }
