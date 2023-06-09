@@ -3,7 +3,7 @@ module github.com/cdvelop/file
 go 1.20
 
 require (
-	github.com/cdvelop/dbtools v0.0.10
+	github.com/cdvelop/dbtools v0.0.11
 	github.com/cdvelop/input v0.0.12
 	github.com/cdvelop/objectdb v0.0.12
 )
