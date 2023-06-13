@@ -23,7 +23,7 @@ func (f File) ReadFile(id_file string, w http.ResponseWriter, r *http.Request) {
 func (f File) ReadOne(id_file string, w http.ResponseWriter, r *http.Request) {
 
 	var message string
-	data := f.ReadObject(f.Name(), id_file)
+	data := f.ReadObject(f.Name(), map[string]string{"id_file": id_file})
 	delete(data, "file_path")
 	// fmt.Println("DATA SOLICITADA: ", data)
 	// Servir json
