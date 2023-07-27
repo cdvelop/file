@@ -13,7 +13,7 @@ function NewFrontRequest(props) {
     fetch(URL_HTTPS + EndPoint, {
         method: Method,
         headers: {
-            "Content-Type": content_type,
+            "Content-Action": content_type,
         },
         body: JSON.stringify(Data)
     })

@@ -3,7 +3,7 @@ package file_test
 import (
 	"fmt"
 
-	"github.com/cdvelop/file"
+	"github.com/cdvelop/gotools"
 )
 
 const root_test_folder = "./root_test_folder"
@@ -12,7 +12,7 @@ func DeleteUploadTestFiles() {
 
 	//calcular tamaño máximo carpeta antes de borrar
 
-	err := file.DeleteIfFolderSizeExceeds(root_test_folder, 0)
+	err := gotools.DeleteIfFolderSizeExceeds(root_test_folder, 0)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}

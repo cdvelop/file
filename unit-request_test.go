@@ -28,7 +28,7 @@ func newRequest(method, endpoint string, data_in *model.Response) (response mode
 		log.Fatal(err)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Action", "application/json")
 
 	client := &http.Client{}
 	res, err := client.Do(req)

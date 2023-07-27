@@ -4,18 +4,14 @@ import (
 	"fmt"
 )
 
-func (File) AttachJsFunctions() string {
-	return ""
-}
-
-func (File) SelectedTargetChanges() string {
+func (config) SelectedTargetChanges() string {
 	return "LoadNewPictures(input);"
 }
 
-func (File) InputValueChanges() string {
+func (config) InputValueChanges() string {
 	return "UploadNewFiles(input);"
 }
 
-func (File) FieldAddEventListener(field_name string) string {
+func (config) FieldAddEventListener(field_name string) string {
 	return fmt.Sprintf(`input_%v.addEventListener("change", UploadNewFiles);`, field_name)
 }
