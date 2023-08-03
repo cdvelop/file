@@ -8,13 +8,21 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/cdvelop/dbtools"
 )
 
-func (c config) processFiles(files []*multipart.FileHeader, upload_folder string, new_data map[string]string) ([]map[string]string, error) {
+var uid *dbtools.UnixID
+
+func init() {
+	uid = dbtools.NewUnixIdHandler()
+}
+
+func (f File) processFiles(files []*multipart.FileHeader, upload_folder string, new_data map[string]string) ([]map[string]string, error) {
 	data_out := []map[string]string{}
 	for _, fileHeader := range files {
-		if fileHeader.Size > c.maximum_file_size {
-			return nil, fmt.Errorf(fmt.Sprintf("error archivo(s) excede(n) el tamaño admitido de: %v kb", c.max_kb_size), http.StatusNotAcceptable)
+		if fileHeader.Size > f.maximum_file_size {
+			return nil, fmt.Errorf(fmt.Sprintf("error archivo(s) excede(n) el tamaño admitido de: %v kb", f.max_kb_size), http.StatusNotAcceptable)
 		}
 
 		file, err := fileHeader.Open()
@@ -23,25 +31,21 @@ func (c config) processFiles(files []*multipart.FileHeader, upload_folder string
 		}
 		defer file.Close()
 
-		extension := c.getExtension(fileHeader)
+		extension := f.getExtension(fileHeader)
 
-		if !strings.Contains(c.extensions, extension) {
-			return nil, fmt.Errorf("formato de archivo no valido solo se admiten: %v", c.extensions)
+		if !strings.Contains(f.extensions, extension) {
+			return nil, fmt.Errorf("formato de archivo no valido solo se admiten: %v", f.extensions)
 		}
 		extension = filepath.Ext(fileHeader.Filename)
 
-		new_file_name := getNewID()
-		new_data["id_file"] = new_file_name
-		new_data["file_path"] = upload_folder + "/" + new_file_name + extension
+		new_file_name := uid.GetNewID()
+
+		new_data[f.FieldIdFile] = new_file_name
+		new_data[f.FieldFilePath] = upload_folder + "/" + new_file_name + extension
 
 		if len(fileHeader.Filename) > 5 {
-			new_data["description"] = fileHeader.Filename[:len(fileHeader.Filename)-len(extension)]
+			new_data[f.FieldDescription] = fileHeader.Filename[:len(fileHeader.Filename)-len(extension)]
 		}
-
-		// err = c.Object.ValidateData(true, false, new_data)
-		// if err != nil {
-		// 	return nil, err
-		// }
 
 		_, err = file.Seek(0, io.SeekStart)
 		if err != nil {
@@ -65,9 +69,9 @@ func (c config) processFiles(files []*multipart.FileHeader, upload_folder string
 		}
 
 		// borramos el campo files
-		delete(new_data, c.Fields[6].Name)
+		delete(new_data, f.FieldFiles)
 
-		err = c.CreateObjectsInDB(c.Object.Name, new_data)
+		err = f.db.CreateObjectsInDB(f.Name, new_data)
 		if err != nil {
 			//borrar archivo creado en disco
 			file_delete := dst.Name()
@@ -82,8 +86,8 @@ func (c config) processFiles(files []*multipart.FileHeader, upload_folder string
 		}
 
 		out := map[string]string{
-			"id_file":     new_file_name,
-			"description": new_data["description"],
+			f.FieldIdFile:      new_file_name,
+			f.FieldDescription: new_data[f.FieldDescription],
 		}
 
 		data_out = append(data_out, out)

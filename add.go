@@ -10,55 +10,55 @@ import (
 )
 
 // conf:
+// api_name:voucher,user_photo,boleta... default file
 // filetype:video, pdf, document. default imagen
 // root_folder:static_files default "app_files"
 // max_files:1, 4, 6.. default 6
 // max_kb_size:100, 400 default 50
-func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *config {
+func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *File {
 
-	c := config{
-		Object: model.Object{
-			Name:           "file",
-			TextFieldNames: []string{"field_name", "description"},
-			Fields: []model.Field{
-				{Name: "id_file", Legend: "Id", Input: input.Pk()},
-				{Name: "module_name", Legend: "Modulo", Input: input.TextNumCode()},
-				{Name: "field_name", Legend: "Carpeta Campo", Input: input.TextOnly()},
-				{Name: "folder_id", Legend: "Carpeta Registro", Input: input.Pk()},
-				{Name: "description", Legend: "Descripción", Input: input.Text(`title="Min. 3 Max. 50 caracteres"`, `pattern="^[A-Za-zÑñáéíóú ]{3,50}$"`), SkipCompletionAllowed: true},
-				{Name: "file_path", Legend: "Ubicación", Input: input.FilePath(), SkipCompletionAllowed: true},
-				{Name: "files", NotRequiredInDB: true, Legend: "Archivos", Input: input.Text()},
-			},
-			Module:           m,
-			BackendRequest:   model.BackendRequest{},
-			FrontendResponse: model.FrontendResponse{},
-		}, //nota: al no declarar el puntero se pierde posteriormente
-		DataBaseAdapter: db,
-		name:            "file",
-		filetype:        "imagen",
-		root_folder:     "app_files",
-		extensions:      ".jpg, .png, .jpeg, .webp",
-		max_files:       6,
-		max_kb_size:     50,
+	f := File{
+		Name:             "file",
+		FieldIdFile:      "id_file",
+		FieldModuleName:  "module_name",
+		FieldName:        "field_name",
+		FieldFolderId:    "folder_id",
+		FieldDescription: "description",
+		FieldFilePath:    "file_path",
+		FieldFiles:       "files",
+
+		object: nil,
+		db:     db,
+
+		filetype:    "imagen",
+		root_folder: "app_files",
+		extensions:  ".jpg, .png, .jpeg, .webp",
+		max_files:   6,
+		max_kb_size: 50,
 	}
+
+	var api_name string
 
 	for _, option := range conf {
 
 		switch {
 
+		case strings.Contains(option, "api_name:"):
+			gotools.ExtractTwoPointArgument(option, &api_name)
+
 		case strings.Contains(option, "root_folder:"):
-			gotools.ExtractTwoPointArgument(option, &c.root_folder)
+			gotools.ExtractTwoPointArgument(option, &f.root_folder)
 
 		case strings.Contains(option, "filetype:"):
-			gotools.ExtractTwoPointArgument(option, &c.filetype)
+			gotools.ExtractTwoPointArgument(option, &f.filetype)
 
-			switch c.filetype {
+			switch f.filetype {
 			case "video":
-				c.extensions = ".avi, .mkv, .mp4"
+				f.extensions = ".avi, .mkv, .mp4"
 			case "document":
-				c.extensions = ".doc, .xlsx, .txt"
+				f.extensions = ".doc, .xlsx, .txt"
 			case "pdf":
-				c.extensions = ".pdf"
+				f.extensions = ".pdf"
 			}
 
 		case strings.Contains(option, "max_files:"):
@@ -69,7 +69,7 @@ func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *config {
 			if err != nil {
 				gotools.ShowErrorAndExit("Error al convertir max_files la cadena: " + max_files + " " + err.Error())
 			}
-			c.max_files = num
+			f.max_files = num
 
 		case strings.Contains(option, "max_kb_size:"):
 			var max_kb_size string
@@ -79,42 +79,58 @@ func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *config {
 			if err != nil {
 				gotools.ShowErrorAndExit("Error al convertir max_kb_size la cadena: " + max_kb_size + " " + err.Error())
 			}
-			c.max_kb_size = num
+			f.max_kb_size = num
 
 		}
 	}
 
-	c.maximum_file_size = int64(float64(c.max_files*c.max_kb_size*1024) * 1.05)
+	f.maximum_file_size = int64(float64(f.max_files*f.max_kb_size*1024) * 1.05)
 
-	c.Object.BackendRequest = model.BackendRequest{
-		CreateApi: c,
-		ReadApi:   c,
-		UpdateApi: c,
-		DeleteApi: c,
-		FileApi:   c,
+	o := model.Object{
+		Name:           f.Name,
+		TextFieldNames: []string{f.FieldName, f.FieldDescription},
+		Fields: []model.Field{
+			{Name: f.FieldIdFile, Legend: "Id", Input: input.Pk()},
+			{Name: f.FieldModuleName, Legend: "Modulo", Input: input.TextNumCode()},
+			{Name: f.FieldName, Legend: "Carpeta Campo", Input: input.TextOnly()},
+			{Name: f.FieldFolderId, Legend: "Carpeta Registro", Input: input.Pk()},
+			{Name: f.FieldDescription, Legend: "Descripción", Input: input.Text(`title="Min. 3 Max. 50 caracteres"`, `pattern="^[A-Za-zÑñáéíóú ]{3,50}$"`), SkipCompletionAllowed: true},
+			{Name: f.FieldFilePath, Legend: "Ubicación", Input: input.FilePath(), SkipCompletionAllowed: true},
+			{Name: f.FieldFiles, NotRequiredInDB: true, Legend: "Archivos", Input: input.Text()},
+		},
+		BackendRequest: model.BackendRequest{
+			CreateApi: nil,
+			ReadApi:   f,
+			UpdateApi: f,
+			DeleteApi: f,
+			FileApi:   f,
+		},
+		FrontendResponse: model.FrontendResponse{},
 	}
 
-	// for _, field := range c.Fields {
-	// 	fmt.Println("CAMPO: ", field.Name)
+	f.object = &o
+	o.AddModule(m, api_name)
 
-	c.Object.AddModule(m)
-
-	err := db.CreateTablesInDB(&c.Object)
+	err := db.CreateTablesInDB(&o)
 	if err != nil {
 		gotools.ShowErrorAndExit(err.Error())
 	}
 
-	return &c
+	//nota: al no declarar punteros se pierden posteriormente
+
+	// fmt.Println("Api objeto: ", o.Api())
+
+	return &f
 }
 
-func (c config) Name() string {
-	return c.name
+func (f File) Object() *model.Object {
+	return f.object
 }
 
-func (config) HtmlName() string {
+func (File) HtmlName() string {
 	return "file"
 }
 
-func (c config) MaximumFileSize() int64 {
-	return c.maximum_file_size
+func (f File) MaximumFileSize() int64 {
+	return f.maximum_file_size
 }

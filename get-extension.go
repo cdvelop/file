@@ -2,7 +2,7 @@ package file
 
 import "mime/multipart"
 
-func (c config) getExtension(fileHeader *multipart.FileHeader) string {
+func (f File) getExtension(fileHeader *multipart.FileHeader) string {
 	buff := make([]byte, 512)
 	file, err := fileHeader.Open()
 	if err != nil {

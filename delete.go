@@ -1,14 +1,29 @@
 package file
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
-func deleteFileFromHdd(file_path string) error {
+func (f File) Delete(params ...map[string]string) ([]map[string]string, error) {
 
-	// Borrar archivos
-	err := os.Remove(file_path)
+	// fmt.Println("parámetros Delete recibidos:", params)
+
+	recover_data, err := f.db.DeleteObjectsInDB(f.Name, params...)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	// fmt.Println("DATA RECOBRADA DESPUÉS DE BORRAR: ", recover_data)
+
+	for _, data := range recover_data {
+
+		// Borrar archivos desde hdd
+		err := os.Remove(data[f.FieldFilePath])
+		if err != nil {
+			return nil, fmt.Errorf("archivo %s fue eliminado de la db pero no del hdd %s", data[f.FieldName], err)
+		}
+	}
+
+	return recover_data, nil
 }
