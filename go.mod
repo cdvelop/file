@@ -17,7 +17,7 @@ require (
 )
 
 require (
-	github.com/cdvelop/gotools v0.0.22
+	github.com/cdvelop/gotools v0.0.24
 	github.com/cdvelop/model v0.0.36
 	github.com/cdvelop/sqlite v0.0.34
 	github.com/gabriel-vasile/mimetype v1.4.2
