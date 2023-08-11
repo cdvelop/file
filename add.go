@@ -7,6 +7,7 @@ import (
 	"github.com/cdvelop/gotools"
 	"github.com/cdvelop/input"
 	"github.com/cdvelop/model"
+	. "github.com/cdvelop/output"
 )
 
 // conf:
@@ -67,7 +68,7 @@ func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *File {
 
 			num, err := strconv.ParseInt(max_files, 10, 64)
 			if err != nil {
-				gotools.ShowErrorAndExit("Error al convertir max_files la cadena: " + max_files + " " + err.Error())
+				ShowErrorAndExit("Error al convertir max_files la cadena: " + max_files + " " + err.Error())
 			}
 			f.max_files = num
 
@@ -77,7 +78,7 @@ func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *File {
 
 			num, err := strconv.ParseInt(max_kb_size, 10, 64)
 			if err != nil {
-				gotools.ShowErrorAndExit("Error al convertir max_kb_size la cadena: " + max_kb_size + " " + err.Error())
+				ShowErrorAndExit("Error al convertir max_kb_size la cadena: " + max_kb_size + " " + err.Error())
 			}
 			f.max_kb_size = num
 
@@ -113,7 +114,7 @@ func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *File {
 
 	err := db.CreateTablesInDB(&o)
 	if err != nil {
-		gotools.ShowErrorAndExit(err.Error())
+		ShowErrorAndExit(err.Error())
 	}
 
 	//nota: al no declarar punteros se pierden posteriormente
