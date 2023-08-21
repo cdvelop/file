@@ -13,7 +13,7 @@ func (d *dataTest) readFileTest(in model.Response, t *testing.T) {
 
 		// fmt.Println("DATA A ENVIAR PARA LECTURA: ", in.Data)
 		for _, data := range in.Data {
-			d.Endpoint = "/file/" + d.Api()
+			d.Endpoint = "/file/" + d.ID()
 
 			new_data := map[string]string{"id_file": data["id_file"]}
 
@@ -39,7 +39,7 @@ func (d *dataTest) readTest(in model.Response, t *testing.T) {
 		// fmt.Println("DATA A ENVIAR PARA LECTURA JSON: ", in.Data)
 
 		for _, data := range in.Data {
-			d.Endpoint = "/read/" + d.Api()
+			d.Endpoint = "/read/" + d.ID()
 
 			new_data := map[string]string{"id_file": data["id_file"]}
 
@@ -73,7 +73,7 @@ func (d *dataTest) readTest(in model.Response, t *testing.T) {
 		// fmt.Println("DATA FOLDER ID PARA LECTURA JSON: ", folders_ids)
 
 		for _, new_data := range folders_ids {
-			d.Endpoint = "/read/" + d.Api()
+			d.Endpoint = "/read/" + d.ID()
 
 			responses, code, err := d.Get(new_data)
 

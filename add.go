@@ -119,7 +119,7 @@ func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *File {
 
 	//nota: al no declarar punteros se pierden posteriormente
 
-	// fmt.Println("Api objeto: ", o.Api())
+	// fmt.Println("Api objeto: ", o.ID())
 
 	return &f
 }
