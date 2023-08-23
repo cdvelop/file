@@ -6,7 +6,7 @@ require (
 	github.com/cdvelop/api v0.0.15
 	github.com/cdvelop/cutkey v0.6.0
 	github.com/cdvelop/dbtools v0.0.27
-	github.com/cdvelop/input v0.0.19
+	github.com/cdvelop/input v0.0.21
 	github.com/cdvelop/testools v0.0.3
 )
 
