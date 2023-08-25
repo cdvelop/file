@@ -56,7 +56,7 @@ func Test_CrudFILE(t *testing.T) {
 
 			data.Cut = cutkey.Add(data.Object)
 
-			api_conf := api.Add([]*model.Module{data.Module})
+			api_conf := api.Add([]*model.Module{data.Module}, nil)
 
 			mux := api_conf.ServeMuxAndRoutes()
 
