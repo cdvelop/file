@@ -24,7 +24,7 @@ function NewFrontRequest(props) {
         .catch(err => {
             const error_msg = "OCURRIÓ UN ERROR AL ACCEDER A LA API " + EndPoint;
             let message = err.statusText || error_msg;
-            ShowMessageType("err", message)
+            ShowMessageToUser("err", message)
         });
 
 }
