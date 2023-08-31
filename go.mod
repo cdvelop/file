@@ -6,7 +6,7 @@ require (
 	github.com/cdvelop/api v0.0.15
 	github.com/cdvelop/cutkey v0.6.0
 	github.com/cdvelop/dbtools v0.0.27
-	github.com/cdvelop/input v0.0.21
+	github.com/cdvelop/input v0.0.24
 	github.com/cdvelop/testools v0.0.3
 )
 
@@ -18,11 +18,10 @@ require (
 
 require (
 	github.com/cdvelop/gotools v0.0.30
-	github.com/cdvelop/model v0.0.41
+	github.com/cdvelop/model v0.0.42
 	github.com/cdvelop/output v0.0.2
 	github.com/cdvelop/sqlite v0.0.41
 	github.com/gabriel-vasile/mimetype v1.4.2
-	golang.org/x/text v0.12.0 // indirect
 )
 
 replace github.com/cdvelop/model => ../model
