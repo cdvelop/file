@@ -18,7 +18,7 @@ require (
 
 require (
 	github.com/cdvelop/gotools v0.0.30
-	github.com/cdvelop/model v0.0.42
+	github.com/cdvelop/model v0.0.43
 	github.com/cdvelop/output v0.0.2
 	github.com/cdvelop/sqlite v0.0.41
 	github.com/gabriel-vasile/mimetype v1.4.2
