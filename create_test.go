@@ -28,7 +28,7 @@ func (d *dataTest) create(prueba string, t *testing.T) (responses []model.Respon
 		// fmt.Println("METHOD: ", d.Method)
 
 		// var code int
-		d.Endpoint += "/" + d.ID()
+		d.Endpoint += d.file.Object().Name
 
 		// fmt.Println("ENDPOINT CREATE: ", d.Endpoint)
 

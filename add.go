@@ -3,20 +3,28 @@ package file
 import (
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/cdvelop/gotools"
 	"github.com/cdvelop/input"
 	"github.com/cdvelop/model"
 	. "github.com/cdvelop/output"
+	"github.com/cdvelop/timeserver"
+	"github.com/cdvelop/unixid"
 )
 
 // conf:
-// api_name:voucher,user_photo,boleta... default file
+// field_name:voucher,user_photo,boleta... default file
 // filetype:video, pdf, document. default imagen
 // root_folder:static_files default "app_files"
 // max_files:1, 4, 6.. default 6
 // max_kb_size:100, 400 default 50
 func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *File {
+
+	new_hid, err := unixid.NewHandler(timeserver.TimeServer{}, &sync.Mutex{}, nil)
+	if err != nil {
+		ShowErrorAndExit(err.Error())
+	}
 
 	f := File{
 		Name:             "file",
@@ -30,6 +38,7 @@ func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *File {
 
 		object: nil,
 		db:     db,
+		uid:    new_hid,
 
 		filetype:    "imagen",
 		root_folder: "app_files",
@@ -38,14 +47,14 @@ func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *File {
 		max_kb_size: 50,
 	}
 
-	var api_name string
+	var field_name string
 
 	for _, option := range conf {
 
 		switch {
 
-		case strings.Contains(option, "api_name:"):
-			gotools.ExtractTwoPointArgument(option, &api_name)
+		case strings.Contains(option, "field_name:"):
+			gotools.ExtractTwoPointArgument(option, &field_name)
 
 		case strings.Contains(option, "root_folder:"):
 			gotools.ExtractTwoPointArgument(option, &f.root_folder)
@@ -85,41 +94,44 @@ func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *File {
 		}
 	}
 
+	if field_name == "" {
+		ShowErrorAndExit("error field_name no ingresado")
+	}
+
 	f.maximum_file_size = int64(float64(f.max_files*f.max_kb_size*1024) * 1.05)
 
 	o := model.Object{
-		Name:           f.Name,
-		TextFieldNames: []string{f.FieldName, f.FieldDescription},
+		Name:                m.ModuleName + "." + field_name,
+		Table:               f.Name,
+		NamePrincipalFields: []string{f.FieldName, f.FieldDescription},
 		Fields: []model.Field{
-			{Name: f.FieldIdFile, Legend: "Id", Input: input.Pk()},
+			{Name: f.FieldIdFile, Legend: "Id", Input: unixid.InputPK()},
 			{Name: f.FieldModuleName, Legend: "Modulo", Input: input.TextNumCode()},
-			{Name: f.FieldName, Legend: "Carpeta Campo", Input: input.TextOnly()},
-			{Name: f.FieldFolderId, Legend: "Carpeta Registro", Input: input.Pk()},
+			{Name: f.FieldName, Legend: "Carpeta Campo", Input: input.TextNum()},
+			{Name: f.FieldFolderId, Legend: "Carpeta Registro", Input: unixid.InputPK()},
 			{Name: f.FieldDescription, Legend: "Descripción", Input: input.Text(`title="Min. 3 Max. 50 caracteres"`, `pattern="^[A-Za-zÑñáéíóú ]{3,50}$"`), SkipCompletionAllowed: true},
 			{Name: f.FieldFilePath, Legend: "Ubicación", Input: input.FilePath(), SkipCompletionAllowed: true},
 			{Name: f.FieldFiles, NotRequiredInDB: true, Legend: "Archivos", Input: input.Text()},
 		},
-		BackendRequest: model.BackendRequest{
+		BackendHandler: model.BackendHandler{
 			CreateApi: nil,
 			ReadApi:   f,
 			UpdateApi: f,
 			DeleteApi: f,
 			FileApi:   f,
 		},
-		FrontendResponse: model.FrontendResponse{},
+		FrontendHandler: model.FrontendHandler{},
 	}
 
 	f.object = &o
-	o.AddModule(m, api_name)
+	o.Module = m
 
-	err := db.CreateTablesInDB(&o)
+	err = db.CreateTablesInDB([]*model.Object{&o}, nil)
 	if err != nil {
 		ShowErrorAndExit(err.Error())
 	}
 
 	//nota: al no declarar punteros se pierden posteriormente
-
-	// fmt.Println("Api objeto: ", o.ID())
 
 	return &f
 }

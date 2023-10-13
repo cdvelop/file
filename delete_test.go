@@ -12,7 +12,7 @@ func (d dataTest) deleteTest(r model.Response, t *testing.T) {
 	t.Run("DELETE Test:", func(t *testing.T) {
 		// Crear una solicitud DELETE
 
-		d.Endpoint = "/delete/" + d.ID()
+		d.Endpoint = "/delete/" + d.file.Object().Name
 
 		d.Data = r.Data
 

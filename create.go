@@ -3,10 +3,12 @@ package file
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/cdvelop/model"
 )
 
 // CreateFile upload files http handler
-func (f File) CreateFile(r *http.Request, params map[string]string) ([]map[string]string, error) {
+func (f File) CreateFile(u *model.User, r *http.Request, params map[string]string) ([]map[string]string, error) {
 
 	upload_folder := f.buildUploadFolder(params)
 

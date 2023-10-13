@@ -13,7 +13,7 @@ func (d *dataTest) readFileTest(in model.Response, t *testing.T) {
 
 		// fmt.Println("DATA A ENVIAR PARA LECTURA: ", in.Data)
 		for _, data := range in.Data {
-			d.Endpoint = "/file/" + d.ID()
+			d.Endpoint = "/file/" + d.file.Object().Name
 
 			new_data := map[string]string{"id_file": data["id_file"]}
 
@@ -39,7 +39,7 @@ func (d *dataTest) readTest(in model.Response, t *testing.T) {
 		// fmt.Println("DATA A ENVIAR PARA LECTURA JSON: ", in.Data)
 
 		for _, data := range in.Data {
-			d.Endpoint = "/read/" + d.ID()
+			d.Endpoint = "/read/" + d.file.Object().Name
 
 			new_data := map[string]string{"id_file": data["id_file"]}
 
@@ -60,7 +60,7 @@ func (d *dataTest) readTest(in model.Response, t *testing.T) {
 				}
 
 				if path, file_path := resp.Data[i]["file_path"]; file_path {
-					log.Fatalln("error de seguridad no se espera recibir la ruta del archivo en el servidor ", path)
+					log.Fatalln("error de seguridad servidor de archivos. no se espera recibir la ruta del archivo como respuesta de lectura al cliente ej:", path)
 				}
 
 				testools.CheckTest("read data json", 200, code, resp)
@@ -73,7 +73,7 @@ func (d *dataTest) readTest(in model.Response, t *testing.T) {
 		// fmt.Println("DATA FOLDER ID PARA LECTURA JSON: ", folders_ids)
 
 		for _, new_data := range folders_ids {
-			d.Endpoint = "/read/" + d.ID()
+			d.Endpoint = "/read/" + d.file.Object().Name
 
 			responses, code, err := d.Get(new_data)
 

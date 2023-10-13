@@ -3,9 +3,11 @@ package file
 import (
 	"fmt"
 	"os"
+
+	"github.com/cdvelop/model"
 )
 
-func (f File) Delete(params ...map[string]string) ([]map[string]string, error) {
+func (f File) Delete(u *model.User, params ...map[string]string) ([]map[string]string, error) {
 
 	// fmt.Println("parámetros Delete recibidos:", params)
 

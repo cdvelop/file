@@ -17,7 +17,7 @@ func (d *dataTest) updateTest(r model.Response, t *testing.T) {
 			data[d.file.FieldDescription] = "perro"
 		}
 
-		d.Endpoint = "/update/" + d.ID()
+		d.Endpoint = "/update/" + d.file.Object().Name
 
 		d.Data = r.Data
 

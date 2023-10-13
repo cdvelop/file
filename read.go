@@ -1,8 +1,12 @@
 package file
 
-import "fmt"
+import (
+	"fmt"
 
-func (f File) FilePath(params map[string]string) (string, error) {
+	"github.com/cdvelop/model"
+)
+
+func (f File) FilePath(u *model.User, params map[string]string) (string, error) {
 	// fmt.Println("parámetros FilePath recibidos: ", params)
 
 	data, err := f.db.ReadObjectsInDB(f.Name, params)
@@ -17,12 +21,12 @@ func (f File) FilePath(params map[string]string) (string, error) {
 	return data[0][f.FieldFilePath], nil
 }
 
-func (f File) Read(params ...map[string]string) ([]map[string]string, error) {
+func (f File) Read(u *model.User, params ...map[string]string) ([]map[string]string, error) {
 
 	// fmt.Println("parámetros leer recibidos:", params)
 
 	for _, v := range params {
-		v["choose"] = f.FieldModuleName + "," + f.FieldName + "," + f.FieldFolderId + "," + f.FieldDescription
+		v["SELECT"] = f.FieldModuleName + "," + f.FieldName + "," + f.FieldFolderId + "," + f.FieldDescription
 	}
 
 	data, err := f.db.ReadObjectsInDB(f.Name, params...)

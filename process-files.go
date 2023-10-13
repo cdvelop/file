@@ -8,15 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/cdvelop/dbtools"
 )
-
-var uid *dbtools.UnixID
-
-func init() {
-	uid = dbtools.NewUnixIdHandler()
-}
 
 func (f File) processFiles(files []*multipart.FileHeader, upload_folder string, new_data map[string]string) ([]map[string]string, error) {
 	data_out := []map[string]string{}
@@ -38,7 +30,7 @@ func (f File) processFiles(files []*multipart.FileHeader, upload_folder string, 
 		}
 		extension = filepath.Ext(fileHeader.Filename)
 
-		new_file_name := uid.GetNewID()
+		new_file_name := f.uid.GetNewID()
 
 		new_data[f.FieldIdFile] = new_file_name
 		new_data[f.FieldFilePath] = upload_folder + "/" + new_file_name + extension

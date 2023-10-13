@@ -2,6 +2,7 @@ package file
 
 import (
 	"github.com/cdvelop/model"
+	"github.com/cdvelop/unixid"
 )
 
 type File struct {
@@ -19,6 +20,8 @@ type File struct {
 
 	object *model.Object
 	db     model.DataBaseAdapter
+
+	uid *unixid.UnixID
 
 	filetype          string //imagen, video, document
 	root_folder       string //ej: "./app_files"

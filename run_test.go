@@ -17,9 +17,9 @@ import (
 var (
 	dataHttp = map[string]dataTest{
 
-		"crear 2 archivos gatito 220kb y dino 36kb": {field_name: "endoscopia", files: []string{"dino.png", "gatito.jpeg"}, file_type: "imagen", max_files: "2", max_size: "262", expected: "create", Request: &testools.Request{Endpoint: "/create", Method: "POST"}},
-		// "gatito 220kb ok":                                     {field_name:"foto_mascota",files: []string{"gatito.jpeg"},file_type:  "imagen",max_files: "1",max_size: "220",expected: "create",Request:&testools.Request{Endpoint:"file/upload",Method: "POST",},},
-		// "tamaño gatito 220kb y permitido 200 se espera error": {field_name:"foto_mascota",files: []string{"gatito.jpeg"},file_type:  "imagen",max_files: "1",max_size: "200",expected: "error",Request:&testools.Request{Endpoint:"file/upload",Method: "POST",},},
+		"crear 2 archivos gatito 220kb y dino 36kb": {field_name: "endoscopia", files: []string{"dino.png", "gatito.jpeg"}, file_type: "imagen", max_files: "2", max_size: "262", expected: "create", Request: &testools.Request{Endpoint: "/create/", Method: "POST"}},
+		"gatito 220kb ok": {field_name: "foto_mascota", files: []string{"gatito.jpeg"}, file_type: "imagen", max_files: "1", max_size: "220", expected: "create", Request: &testools.Request{Endpoint: "/create/", Method: "POST"}},
+		"tamaño gatito 220kb y permitido 200 se espera error": {field_name: "foto_mascota", files: []string{"gatito.jpeg"}, file_type: "imagen", max_files: "1", max_size: "200", expected: "error", Request: &testools.Request{Endpoint: "/create/", Method: "POST"}},
 	}
 )
 
@@ -50,9 +50,11 @@ func Test_CrudFILE(t *testing.T) {
 				Objects:    []*model.Object{},
 			}
 
-			data.file = file.New(data.Module, db, "api_name:"+data.field_name, "root_folder:"+root_test_folder, "max_files:"+data.max_files, "max_kb_size:"+data.max_size)
+			data.file = file.New(data.Module, db, "field_name:"+data.field_name, "root_folder:"+root_test_folder, "max_files:"+data.max_files, "max_kb_size:"+data.max_size)
 
 			data.Object = data.file.Object()
+
+			data.Module.Objects = append(data.Module.Objects, data.Object)
 
 			data.Cut = cutkey.Add(data.Object)
 
@@ -64,6 +66,8 @@ func Test_CrudFILE(t *testing.T) {
 			defer data.Server.Close()
 
 			responses := data.create(prueba, t)
+
+			// log.Println(responses)
 
 			for _, response := range responses {
 
