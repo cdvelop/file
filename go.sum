@@ -1,5 +1,5 @@
-github.com/cdvelop/gotools v0.0.42 h1:+QhfDR7Ctx7LM4ul/Fyq5GA6sSeKImPSBUchjPm8oVA=
-github.com/cdvelop/gotools v0.0.42/go.mod h1:O1qFUW4C7oKtPD9kR7smgJlDAtMicRKbjDsnyu7uNn8=
+github.com/cdvelop/gotools v0.0.43 h1:6HEppsMtvWUINqvyv371wXli2bJAYXotG8GeiW5i8Pg=
+github.com/cdvelop/gotools v0.0.43/go.mod h1:MXj0A4f21pQX1bG+TcoNm6GSklYIi/2Az1O/CdzjAS8=
 github.com/gabriel-vasile/mimetype v1.4.3 h1:in2uUcidCuFcDKtdcBxlR0rJ1+fsokWf+uqxgUFjbI0=
 github.com/gabriel-vasile/mimetype v1.4.3/go.mod h1:d8uq/6HKRL6CGdk+aubisF/M5GcPfT7nKyLpA0lbSSk=
 github.com/mattn/go-sqlite3 v1.14.17 h1:mCRHCLDUBXgpKAqIKsaAaAsrAlbkeomtRFKXh2L6YIM=

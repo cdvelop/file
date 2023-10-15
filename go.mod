@@ -19,7 +19,7 @@ require (
 )
 
 require (
-	github.com/cdvelop/gotools v0.0.42
+	github.com/cdvelop/gotools v0.0.43
 	github.com/cdvelop/model v0.0.54
 	github.com/cdvelop/output v0.0.3
 	github.com/cdvelop/sqlite v0.0.65
