@@ -30,13 +30,13 @@ func (f File) processFiles(files []*multipart.FileHeader, upload_folder string, 
 		}
 		extension = filepath.Ext(fileHeader.Filename)
 
-		new_file_name := f.uid.GetNewID()
+		new_file_name := f.idh.GetNewID()
 
-		new_data[f.FieldIdFile] = new_file_name
-		new_data[f.FieldFilePath] = upload_folder + "/" + new_file_name + extension
+		new_data[f.Id_file] = new_file_name
+		new_data[f.File_path] = upload_folder + "/" + new_file_name + extension
 
 		if len(fileHeader.Filename) > 5 {
-			new_data[f.FieldDescription] = fileHeader.Filename[:len(fileHeader.Filename)-len(extension)]
+			new_data[f.Description] = fileHeader.Filename[:len(fileHeader.Filename)-len(extension)]
 		}
 
 		_, err = file.Seek(0, io.SeekStart)
@@ -61,9 +61,9 @@ func (f File) processFiles(files []*multipart.FileHeader, upload_folder string, 
 		}
 
 		// borramos el campo files
-		delete(new_data, f.FieldFiles)
+		delete(new_data, f.Files)
 
-		err = f.db.CreateObjectsInDB(f.Name, new_data)
+		err = f.db.CreateObjectsInDB(f.Object.Table, new_data)
 		if err != nil {
 			//borrar archivo creado en disco
 			file_delete := dst.Name()
@@ -78,8 +78,8 @@ func (f File) processFiles(files []*multipart.FileHeader, upload_folder string, 
 		}
 
 		out := map[string]string{
-			f.FieldIdFile:      new_file_name,
-			f.FieldDescription: new_data[f.FieldDescription],
+			f.Id_file:     new_file_name,
+			f.Description: new_data[f.Description],
 		}
 
 		data_out = append(data_out, out)

@@ -3,6 +3,7 @@ package file_test
 import (
 	"log"
 	"net/http/httptest"
+	"sync"
 	"testing"
 
 	"github.com/cdvelop/api"
@@ -12,6 +13,8 @@ import (
 	"github.com/cdvelop/model"
 	"github.com/cdvelop/sqlite"
 	"github.com/cdvelop/testools"
+	"github.com/cdvelop/timeserver"
+	"github.com/cdvelop/unixid"
 )
 
 var (
@@ -38,6 +41,11 @@ func Test_CrudFILE(t *testing.T) {
 		log.Fatal(err)
 	}
 
+	id_handler, err := unixid.NewHandler(timeserver.TimeServer{}, &sync.Mutex{}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	for prueba, data := range dataHttp {
 		t.Run((prueba), func(t *testing.T) {
 
@@ -48,11 +56,15 @@ func Test_CrudFILE(t *testing.T) {
 				Title:      "Modulo Testing",
 				Areas:      []byte{},
 				Objects:    []*model.Object{},
+				Inputs:     []*model.Input{},
 			}
 
-			data.file = file.New(data.Module, db, "field_name:"+data.field_name, "root_folder:"+root_test_folder, "max_files:"+data.max_files, "max_kb_size:"+data.max_size)
+			data.file, err = file.New(data.Module, db, id_handler, "field_name:"+data.field_name, "root_folder:"+root_test_folder, "max_files:"+data.max_files, "max_kb_size:"+data.max_size)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-			data.Object = data.file.Object()
+			data.Object = data.file.Object
 
 			data.Module.Objects = append(data.Module.Objects, data.Object)
 

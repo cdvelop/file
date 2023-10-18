@@ -3,13 +3,12 @@ package file
 import (
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/cdvelop/gotools"
 	"github.com/cdvelop/input"
 	"github.com/cdvelop/model"
+	"github.com/cdvelop/object"
 	. "github.com/cdvelop/output"
-	"github.com/cdvelop/timeserver"
 	"github.com/cdvelop/unixid"
 )
 
@@ -19,33 +18,28 @@ import (
 // root_folder:static_files default "app_files"
 // max_files:1, 4, 6.. default 6
 // max_kb_size:100, 400 default 50
-func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *File {
+func New(m *model.Module, db model.DataBaseAdapter, id model.IdHandler, conf ...string) (*File, error) {
 
-	new_hid, err := unixid.NewHandler(timeserver.TimeServer{}, &sync.Mutex{}, nil)
+	err := m.AddInputs([]*model.Input{unixid.InputPK(), input.TextNumCode(), input.TextNum(), input.FilePath(), input.Text()}, "file pkg")
 	if err != nil {
-		ShowErrorAndExit(err.Error())
+		return nil, err
 	}
 
-	f := File{
-		Name:             "file",
-		FieldIdFile:      "id_file",
-		FieldModuleName:  "module_name",
-		FieldName:        "field_name",
-		FieldFolderId:    "folder_id",
-		FieldDescription: "description",
-		FieldFilePath:    "file_path",
-		FieldFiles:       "files",
+	f := File{}
 
-		object: nil,
-		db:     db,
-		uid:    new_hid,
-
-		filetype:    "imagen",
-		root_folder: "app_files",
-		extensions:  ".jpg, .png, .jpeg, .webp",
-		max_files:   6,
-		max_kb_size: 50,
+	// crear objeto
+	err = object.New(&f, m)
+	if err != nil {
+		return nil, err
 	}
+
+	f.db = db
+	f.idh = id
+	f.filetype = "imagen"
+	f.root_folder = "app_files"
+	f.extensions = ".jpg, .png, .jpeg, .webp"
+	f.max_files = 6
+	f.max_kb_size = 50
 
 	var field_name string
 
@@ -95,49 +89,21 @@ func New(m *model.Module, db model.DataBaseAdapter, conf ...string) *File {
 	}
 
 	if field_name == "" {
-		ShowErrorAndExit("error field_name no ingresado")
+		return nil, model.Error(`error field_name:"nombre_campo" no ingresado`)
 	}
+
+	f.Object.Name += "." + field_name
 
 	f.maximum_file_size = int64(float64(f.max_files*f.max_kb_size*1024) * 1.05)
 
-	o := model.Object{
-		Name:                m.ModuleName + "." + field_name,
-		Table:               f.Name,
-		NamePrincipalFields: []string{f.FieldName, f.FieldDescription},
-		Fields: []model.Field{
-			{Name: f.FieldIdFile, Legend: "Id", Input: unixid.InputPK()},
-			{Name: f.FieldModuleName, Legend: "Modulo", Input: input.TextNumCode()},
-			{Name: f.FieldName, Legend: "Carpeta Campo", Input: input.TextNum()},
-			{Name: f.FieldFolderId, Legend: "Carpeta Registro", Input: unixid.InputPK()},
-			{Name: f.FieldDescription, Legend: "Descripción", Input: input.Text(`title="Min. 3 Max. 50 caracteres"`, `pattern="^[A-Za-zÑñáéíóú ]{3,50}$"`), SkipCompletionAllowed: true},
-			{Name: f.FieldFilePath, Legend: "Ubicación", Input: input.FilePath(), SkipCompletionAllowed: true},
-			{Name: f.FieldFiles, NotRequiredInDB: true, Legend: "Archivos", Input: input.Text()},
-		},
-		BackendHandler: model.BackendHandler{
-			CreateApi: nil,
-			ReadApi:   f,
-			UpdateApi: f,
-			DeleteApi: f,
-			FileApi:   f,
-		},
-		FrontendHandler: model.FrontendHandler{},
-	}
-
-	f.object = &o
-	o.Module = m
-
-	err = db.CreateTablesInDB([]*model.Object{&o}, nil)
-	if err != nil {
-		ShowErrorAndExit(err.Error())
-	}
+	// err = db.CreateTablesInDB([]*model.Object{&o}, nil)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	//nota: al no declarar punteros se pierden posteriormente
 
-	return &f
-}
-
-func (f File) Object() *model.Object {
-	return f.object
+	return &f, nil
 }
 
 func (File) HtmlName() string {

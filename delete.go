@@ -11,7 +11,7 @@ func (f File) Delete(u *model.User, params ...map[string]string) ([]map[string]s
 
 	// fmt.Println("parámetros Delete recibidos:", params)
 
-	recover_data, err := f.db.DeleteObjectsInDB(f.Name, params...)
+	recover_data, err := f.db.DeleteObjectsInDB(f.Object.Table, params...)
 	if err != nil {
 		return nil, err
 	}
@@ -21,9 +21,9 @@ func (f File) Delete(u *model.User, params ...map[string]string) ([]map[string]s
 	for _, data := range recover_data {
 
 		// Borrar archivos desde hdd
-		err := os.Remove(data[f.FieldFilePath])
+		err := os.Remove(data[f.File_path])
 		if err != nil {
-			return nil, fmt.Errorf("archivo %s fue eliminado de la db pero no del hdd %s", data[f.FieldName], err)
+			return nil, fmt.Errorf("archivo %s fue eliminado de la db pero no del hdd %s", data[f.Field_name], err)
 		}
 	}
 

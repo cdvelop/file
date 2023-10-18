@@ -14,10 +14,10 @@ func (d *dataTest) updateTest(r model.Response, t *testing.T) {
 
 		// fmt.Println("DATA A ACTUALIZAR: ", rq)
 		for _, data := range r.Data {
-			data[d.file.FieldDescription] = "perro"
+			data[d.file.Description] = "perro"
 		}
 
-		d.Endpoint = "/update/" + d.file.Object().Name
+		d.Endpoint = "/update/" + d.file.Object.Name
 
 		d.Data = r.Data
 
@@ -29,8 +29,8 @@ func (d *dataTest) updateTest(r model.Response, t *testing.T) {
 		for i, resp := range responses {
 			testools.CheckTest("update", "update", resp.Action, resp)
 
-			if resp.Data[i][d.file.FieldDescription] != "perro" {
-				fmt.Printf("se esperaba en description [perro] se obtuvo: [%v]", resp.Data[i][d.file.FieldDescription])
+			if resp.Data[i][d.file.Description] != "perro" {
+				fmt.Printf("se esperaba en description [perro] se obtuvo: [%v]", resp.Data[i][d.file.Description])
 				log.Fatal()
 			}
 		}

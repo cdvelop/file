@@ -2,26 +2,24 @@ package file
 
 import (
 	"github.com/cdvelop/model"
-	"github.com/cdvelop/unixid"
 )
 
 type File struct {
 	//table
-	Name             string // file
-	FieldIdFile      string //0 id_file
-	FieldModuleName  string //1 module_name
-	FieldName        string //2 field_name
-	FieldFolderId    string //3 folder_id
-	FieldDescription string //4 description
-	FieldFilePath    string //5 file_path
-	FieldFiles       string //6 files
+	Id_file     string `Legend:"File Id" Input:"InputPK"`                                                   //0 id_file
+	Module_name string `Legend:"Modulo" Input:"TextNumCode"`                                                //1 module_name
+	Field_name  string `Legend:"Carpeta Campo" Input:"TextNum" PrincipalField:"ok"`                         //2 field_name
+	Folder_id   string `Legend:"Carpeta Registro" Input:"InputPK"`                                          //3 folder_id
+	Description string `Legend:"Descripción" Input:"Text" PrincipalField:"ok" SkipCompletionAllowed:"true"` //4 description
+	File_path   string `Legend:"Ubicación" Input:"FilePath" SkipCompletionAllowed:"true"`                   //5 file_path
 
 	//config
+	Files string `Input:"Text" NotRequiredInDB:"true"` //nombre por defecto input html = files
 
-	object *model.Object
+	Object *model.Object
 	db     model.DataBaseAdapter
 
-	uid *unixid.UnixID
+	idh model.IdHandler
 
 	filetype          string //imagen, video, document
 	root_folder       string //ej: "./app_files"
